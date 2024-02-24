@@ -1,0 +1,8 @@
+aws ec2 create-security-group --group-name postgres-replication-sg --description "Security group for PostgreSQL replication"
+
+
+aws ec2 authorize-security-group-ingress --group-id GroupId --protocol tcp --port 22 --cidr 0.0.0.0/0 # ssh
+aws ec2 authorize-security-group-ingress --group-id GroupId --protocol tcp --port 5432 --cidr 0.0.0.0/0 #postgres
+
+
+aws ec2 run-instances --image-id ImageId --count 1 --instance-type InstanceType --key-name YourKeyName --security-group-ids GroupId --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Postgres-Replication-Server-X}]'
