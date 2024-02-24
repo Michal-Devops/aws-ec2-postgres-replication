@@ -1,0 +1,33 @@
+---
+- name: Install PostgreSQL and create a database user on Red Hat servers
+  hosts: postgresql_servers
+  become: yes
+  vars:
+    ansible_ssh_private_key_file: ansible/bazy.pem
+    db_user: "postgres"  # Nazwa nowego użytkownika bazy danych
+    db_password: "admin"  # Hasło dla nowego użytkownika
+
+  tasks:
+    - name: Install PostgreSQL
+      yum:
+        name: postgresql-server
+        state: present
+
+    - name: Initialize the database
+      command: postgresql-setup initdb
+
+    - name: Enable and start the PostgreSQL service
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Create a database user
+      postgresql_user:
+        db: postgres  # Domyślna baza danych, do której ma się połączyć
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: CONNECT  
+        expires: never  
+      become: yes
+      become_user: postgres
