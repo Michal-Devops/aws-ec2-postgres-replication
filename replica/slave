@@ -1,0 +1,12 @@
+sudo systemctl stop postgresql
+
+sudo rm -rf /var/lib/pgsql/data/*
+
+
+sudo -u postgres pg_basebackup -h adres_ip_master -D /var/lib/pgsql/data -U replikator -v -P --wal-method=stream
+
+
+
+sudo touch /var/lib/pgsql/data/standby.signal
+
+sudo systemctl start postgresql
