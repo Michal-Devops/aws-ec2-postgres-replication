@@ -1,0 +1,42 @@
+---
+- name: Ustawianie bazy danych na serwerze PostgreSQL
+  hosts: masters
+  become: yes
+  vars:
+    db_name: "uzytkownicy"
+    db_user: "nida"
+    db_password: "nimda"
+
+  tasks:
+    - name: Stwórz bazę danych
+      postgresql_db:
+        name: "{{ db_name }}"
+        owner: "{{ db_user }}"
+      become_user: postgres
+
+    - name: Stwórz użytkownika bazy danych
+      postgresql_user:
+        db: "{{ db_name }}"
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+      become_user: postgres
+
+    - name: Stwórz tabelę użytkowników
+      postgresql_table:
+        db: "{{ db_name }}"
+        name: uzytkownicy
+        columns:
+          - name: id
+            type: serial
+            constraints: PRIMARY KEY
+          - name: imie
+            type: varchar(50)
+          - name: nazwisko
+            type: varchar(50)
+      become_user: postgres
+
+    - name: Wstaw kilka rekordów do tabeli użytkowników
+      postgresql_query:
+        db: "{{ db_name }}"
+        query: INSERT INTO uzytkownicy (imie, nazwisko) VALUES ('Jan', 'Kowalski'), ('Anna', 'Nowak');
+      become_user: postgres
